@@ -1,29 +1,28 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
-const serviceAccount = require('../functions/key.json');
+// const serviceAccount = require('../functions/key.json');
 
 admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-    databaseURL: "https://charm-me.firebaseio.com"
+    // credential: admin.credential.cert(serviceAccount),
+    // databaseURL: "https://charm-me.firebaseio.com"
   });
 
-// // Create and Deploy Your First Cloud Functions
-// // https://firebase.google.com/docs/functions/write-firebase-functions
-//
-exports.helloWorld = functions.https.onRequest((request, response) => {
- response.send("Hi there!");
-});
+const express = require('express');
+const app = express();
 
-exports.getPosts = functions.https.onRequest((request, response) =>{
-    admin.firestore().collection('posts').get()
-    .then(data => {
+app.get('/posts', (request, reponse) =>{
+    admin.firestore().collection('posts').get().then((data) => {
         let posts =[];
-        data.forEach(doc =>{
+        data.forEach((doc) =>{
             posts.push(doc.data());
         });
         return response.json(posts);
     })
     .catch((err)=> console.error(err));
+});
+
+exports.helloWorld = functions.https.onRequest((request, response) => {
+ response.send("Hi there!");
 });
 
 
@@ -45,4 +44,8 @@ exports.createPost = functions.https.onRequest((request, response) =>{
          response.status(500).json({ error: "Something went wrong"});
          console.error(err);
          });
-     });
+});
+
+//https://baseurl.com/api/
+
+exports.api = functions.https.onRequest(app);
