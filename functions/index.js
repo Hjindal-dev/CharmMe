@@ -1,5 +1,6 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
+
 // const serviceAccount = require('../functions/key.json');
 
 admin.initializeApp({
@@ -10,23 +11,19 @@ admin.initializeApp({
 const express = require('express');
 const app = express();
 
-app.get('/posts', (request, reponse) =>{
-    admin.firestore().collection('posts').get().then((data) => {
-        let posts =[];
-        data.forEach((doc) =>{
+app.get('/posts', (req, res) => {
+    admin.firestore().collection('posts').get()
+    .then((data) => {
+        let posts = [];
+        data.forEach((doc) => {
             posts.push(doc.data());
-        });
-        return response.json(posts);
-    })
-    .catch((err)=> console.error(err));
-});
+    });
+    return res.json(posts);
+})
+.catch((err) => console.error(err));
+})
 
-exports.helloWorld = functions.https.onRequest((request, response) => {
- response.send("Hi there!");
-});
-
-
-exports.createPost = functions.https.onRequest((request, response) =>{
+app.post('/post', (request, response) => {
     const post = {
         //body of request. body is property
         body: request.body.body,
